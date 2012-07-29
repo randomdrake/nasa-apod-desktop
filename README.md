@@ -40,6 +40,7 @@ Installation:
 Run at Startup:
 =====
 If you want the file to automatically run at startup:
+
 1. Click on the settings button (cog in top right)
 2. Select "Startup Applications..."
 3. Click the "Add" button
