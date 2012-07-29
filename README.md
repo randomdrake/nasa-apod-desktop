@@ -1,16 +1,17 @@
 nasa-apod-desktop
 =====
 
-Python Implementation of Downloading the NASA APOD and Setting it as Your Background for Ubuntu
+Python Script to Download the NASA APOD and Set it as Your Background for Ubuntu
 -----
 
 About:
 =====
-The popular NASA Astronomy Picture of the Day produces wonderful images that make for a great desktop background.
+The popular NASA Astronomy Picture of the Day produces wonderful images that make for a great desktop background. This script will download the NASA APOD and set it as your background in Ubuntu.
 
 ![NASA APOD Example](http://randomdrake.com/nasa_apod.jpg "An example of a NASA APOD image.")
 
 http://en.wikipedia.org/wiki/Astronomy_Picture_of_the_Day
+
 http://apod.nasa.gov/apod/astropix.html
 
 Tested on, and created for, Ubuntu 12.04.
@@ -42,10 +43,7 @@ If you want the file to automatically run at startup:
 1. Click on the settings button (cog in top right)
 2. Select "Startup Applications..."
 3. Click the "Add" button
-4. Enter the following:
-Name: NASA APOD Desktop
-Command: python /path/to/nasa_apod_desktop.py
-Comment: Downloads the latest NASA APOD and sets it as the background.
+4. Enter whatever name and comment you like and make sure the "Command" is set to: python /path/to/nasa_apod_desktop.py
 5. Click on the "Add" button
 
 To Do:
