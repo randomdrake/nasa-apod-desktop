@@ -69,7 +69,7 @@ import urllib
 import urllib2
 import re
 import os
-from PIL import Image
+from PIL import Image, ImageOps
 from sys import stdout
 
 # Configurable settings:
@@ -128,7 +128,7 @@ def resize_image(filename):
     image = Image.open(filename)
     if SHOW_DEBUG:
         print "Resizing the image to", RESOLUTION_X, 'x', RESOLUTION_Y
-    image = image.resize((RESOLUTION_X, RESOLUTION_Y), Image.ANTIALIAS)
+    image = ImageOps.fit(image, (RESOLUTION_X, RESOLUTION_Y), Image.ANTIALIAS, 0, (0.5, 0.5IALIAS)
 
     if SHOW_DEBUG:
         print "Saving the image to", filename
