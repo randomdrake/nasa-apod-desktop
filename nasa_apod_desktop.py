@@ -128,7 +128,7 @@ def resize_image(filename):
     image = Image.open(filename)
     if SHOW_DEBUG:
         print "Resizing the image to", RESOLUTION_X, 'x', RESOLUTION_Y
-    image = ImageOps.fit(image, (RESOLUTION_X, RESOLUTION_Y), Image.ANTIALIAS, 0, (0.5, 0.5IALIAS)
+    image = ImageOps.fit(image, (RESOLUTION_X, RESOLUTION_Y), Image.ANTIALIAS, 0, (0.5, 0.5))
 
     if SHOW_DEBUG:
         print "Saving the image to", filename
