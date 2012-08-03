@@ -19,8 +19,8 @@ nasa_apod_desktop.py
 https://github.com/randomdrake/nasa-apod-desktop
 
 Written/Modified by David Drake
-http://randomdrake.com 
-http://twitter.com/randomdrake 
+http://randomdrake.com
+http://twitter.com/randomdrake
 
 Based on apodbackground: http://sourceforge.net/projects/apodbackground/
 Which, is based on: http://0chris.com/nasa-image-day-script-python.html
@@ -36,7 +36,7 @@ Tested on Ubuntu 12.04
 
 
 DESCRIPTION
-1) Grabs the latest image of the day from NASA (http://apod.nasa.gov/apod/). 
+1) Grabs the latest image of the day from NASA (http://apod.nasa.gov/apod/).
 2) Resizes the image to the given resolution.
 3) Sets the image as your desktop.
 4) Adds the image to a list of images that will be cycled through.
@@ -48,10 +48,10 @@ sudo apt-get install python-imaging
 
 Set your resolution variables and your download path (make sure it's writeable):
 '''
-DOWNLOAD_PATH = '/home/randomdrake/backgrounds/'
-RESOLUTION_X = 1680
-RESOLUTION_Y = 1050
-''' 
+DOWNLOAD_PATH = '$HOME/backgrounds/'
+RESOLUTION_X = None
+RESOLUTION_Y = None
+'''
 
 RUN AT STARTUP
 To have this run whenever you startup your computer, perform the following steps:
@@ -69,12 +69,13 @@ import urllib
 import urllib2
 import re
 import os
-from PIL import Image
-from sys import stdout
+import sys
+import subprocess
 
 # Configurable settings:
 NASA_APOD_SITE = 'http://apod.nasa.gov/apod/'
 SHOW_DEBUG = False
+
 
 def download_site(url):
     ''' Download HTML of the site'''
@@ -85,6 +86,7 @@ def download_site(url):
     response = opener.open(req)
     reply = response.read()
     return reply
+
 
 def get_image(text):
     ''' Finds the image URL and saves it '''
@@ -107,33 +109,64 @@ def get_image(text):
 
         if SHOW_DEBUG:
             file_size = float(remote_file.headers.get("content-length"))
-            print "Retrieving image"
+            print "Retrieving image %s, saving to %s" % (file_url, save_to)
             urllib.urlretrieve(file_url, save_to, print_download_status)
 
-            # Adding additional padding to ensure entire line 
-            if SHOW_DEBUG:
-                print "\rDone downloading", human_readable_size(file_size), "       "
-        else: 
+            # Adding additional padding to ensure entire line
+            print "\rDone downloading", human_readable_size(file_size), "       "
+        else:
             urllib.urlretrieve(file_url, save_to)
     elif SHOW_DEBUG:
         print "File exists, moving on"
 
     return save_to
 
+
 def resize_image(filename):
     ''' Resizes the image to the provided dimensions '''
     if SHOW_DEBUG:
         print "Opening local image"
 
-    image = Image.open(filename)
-    if SHOW_DEBUG:
-        print "Resizing the image to", RESOLUTION_X, 'x', RESOLUTION_Y
-    image = image.resize((RESOLUTION_X, RESOLUTION_Y), Image.ANTIALIAS)
+    try:
+        from PIL import Image
+    except ImportError:
+        print "Cannot import PIL! Trying ImageMagick's convert instead"
+        import tempfile
+        import shutil
+        tempfd, tempfn = tempfile.mkstemp()
+        os.close(tempfd)
+        cmd = ['convert', filename, '-adaptive-resize', RESOLUTION_S, '-format', 'png',
+            tempfn]
+        if SHOW_DEBUG:
+            print "Resizing with %s" % ' '.join(cmd)
+        subprocess.check_call(cmd)
+        shutil.copyfile(tempfn, filename)
+    else:
+        image = Image.open(filename)
+        if SHOW_DEBUG:
+            print "Resizing the image to", RESOLUTION_S
+        image = image.resize((RESOLUTION_X, RESOLUTION_Y), Image.ANTIALIAS)
 
-    if SHOW_DEBUG:
-        print "Saving the image to", filename
-    fhandle = open(filename, 'w')
-    image.save(fhandle, 'PNG')
+        if SHOW_DEBUG:
+            print "Saving the image to", filename
+        fhandle = open(filename, 'w')
+        image.save(fhandle, 'PNG')
+
+
+def set_wallpaper(file_path, flavor=None):
+    if not flavor:
+        try:
+            xprop('XFCE_DESKTOP_WINDOW')
+        except KeyError:
+            flavor = 'gnome'
+        else:
+            subprocess.check_call(['xfconf-query', '-c', 'xfce4-desktop',
+                '-p', '/backdrop/screen0/monitor0/image-path',
+                '-s', file_path])
+
+    if 'gnome' == flavor:
+        set_gnome_wallpaper(file_path)
+
 
 def set_gnome_wallpaper(file_path):
     ''' Sets the new image as the wallpaper '''
@@ -143,13 +176,15 @@ def set_gnome_wallpaper(file_path):
     status, output = commands.getstatusoutput(command)
     return status
 
+
 def print_download_status(block_count, block_size, total_size):
     written_size = human_readable_size(block_count * block_size)
     total_size = human_readable_size(total_size)
 
     # Adding space padding at the end to ensure we overwrite the whole line
-    stdout.write("\r%s bytes of %s         " % (written_size, total_size))
-    stdout.flush()
+    sys.stdout.write("\r%s bytes of %s         " % (written_size, total_size))
+    sys.stdout.flush()
+
 
 def human_readable_size(number_bytes):
     for x in ['bytes', 'KB', 'MB']:
@@ -157,15 +192,54 @@ def human_readable_size(number_bytes):
             return "%3.2f%s" % (number_bytes, x)
         number_bytes /= 1024.0
 
+
+def xprop(atom, value=None):
+    atom = str(atom)
+    cmd = ['xprop', '-root']
+    if value:
+        value = str(value)
+        cmd += ['-format', atom, '8s', '-set', atom, value]
+    else:
+        cmd.append(atom)
+    if SHOW_DEBUG:
+        print "Calling", cmd
+    if not value:
+        line = subprocess.check_output(cmd).splitlines()[0]
+        if ' no such atom ' in line:
+            raise KeyError
+        else:
+            return line.split('=' if '=' in line else ':')[1].strip()
+
+
+def get_desktop_geometry():
+    return map(int, xprop('_NET_DESKTOP_GEOMETRY').split(','))
+
+
 if __name__ == '__main__':
     ''' Our program '''
-    if SHOW_DEBUG: 
+    if not (RESOLUTION_X and RESOLUTION_Y):
+        RESOLUTION_X, RESOLUTION_Y = get_desktop_geometry()
+    from optparse import OptionParser
+    op = OptionParser()
+    op.add_option('-v', '--verbose', action='store_true', default=False)
+    op.add_option('--download-path', default=DOWNLOAD_PATH)
+    op.add_option('--site', default=NASA_APOD_SITE)
+    op.add_option('-s', '--size',
+        default='%dx%d' % (RESOLUTION_X, RESOLUTION_Y))
+    opts, args = op.parse_args()
+    SHOW_DEBUG = SHOW_DEBUG or opts.verbose
+    DOWNLOAD_PATH = opts.download_path
+    NASA_APOD_SITE = opts.site
+    RESOLUTION_X, RESOLUTION_Y = map(int, opts.size.split('x', 1))
+    RESOLUTION_S = '%dx%d' % (RESOLUTION_X, RESOLUTION_Y)
+    if SHOW_DEBUG:
         print "Starting"
     # Create the download path if it doesn't exist
+    DOWNLOAD_PATH = os.path.expandvars(DOWNLOAD_PATH)
     if not os.path.exists(os.path.expanduser(DOWNLOAD_PATH)):
         os.makedirs(os.path.expanduser(DOWNLOAD_PATH))
 
-    # Grab the HTML contents of the file 
+    # Grab the HTML contents of the file
     site_contents = download_site(NASA_APOD_SITE)
 
     # Download the image
@@ -175,7 +249,7 @@ if __name__ == '__main__':
     resize_image(filename)
 
     # Set the wallpaper
-    status = set_gnome_wallpaper(filename)
+    status = set_wallpaper(filename)
     if SHOW_DEBUG:
         print "Finished!"
 
