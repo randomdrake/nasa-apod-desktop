@@ -48,7 +48,7 @@ sudo apt-get install python-imaging
 
 Set your resolution variables and your download path (make sure it's writeable):
 '''
-DOWNLOAD_PATH = '$HOME/backgrounds/'
+DOWNLOAD_PATH = None
 RESOLUTION_X = None
 RESOLUTION_Y = None
 '''
@@ -75,6 +75,7 @@ import subprocess
 # Configurable settings:
 NASA_APOD_SITE = 'http://apod.nasa.gov/apod/'
 SHOW_DEBUG = False
+PRINT_RATE = 1
 
 
 def download_site(url):
@@ -101,7 +102,8 @@ def get_image(text):
         file_url = NASA_APOD_SITE + reg.group(1)
 
     filename = os.path.basename(file_url)
-    save_to = DOWNLOAD_PATH + os.path.splitext(filename)[0] + '.png'
+    save_to = os.path.join(DOWNLOAD_PATH,
+        os.path.splitext(filename)[0] + '.png')
     if not os.path.isfile(save_to):
         if SHOW_DEBUG:
             print "Opening remote URL"
@@ -128,7 +130,7 @@ def resize_image(filename):
         print "Opening local image"
 
     try:
-        from PIL import Image
+        from PIL import Image, ImageOps
     except ImportError:
         print "Cannot import PIL! Trying ImageMagick's convert instead"
         import tempfile
@@ -145,7 +147,8 @@ def resize_image(filename):
         image = Image.open(filename)
         if SHOW_DEBUG:
             print "Resizing the image to", RESOLUTION_S
-        image = image.resize((RESOLUTION_X, RESOLUTION_Y), Image.ANTIALIAS)
+        image = ImageOps.fit(image, (RESOLUTION_X, RESOLUTION_Y),
+            Image.ANTIALIAS, (0.5, 0.5))
 
         if SHOW_DEBUG:
             print "Saving the image to", filename
@@ -176,14 +179,21 @@ def set_gnome_wallpaper(file_path):
     status, output = commands.getstatusoutput(command)
     return status
 
+_t = None
+
 
 def print_download_status(block_count, block_size, total_size):
+    global _t
+    import time
+    if _t and _t > time.time() - PRINT_RATE:
+        return
     written_size = human_readable_size(block_count * block_size)
     total_size = human_readable_size(total_size)
 
     # Adding space padding at the end to ensure we overwrite the whole line
     sys.stdout.write("\r%s bytes of %s         " % (written_size, total_size))
     sys.stdout.flush()
+    _t = time.time()
 
 
 def human_readable_size(number_bytes):
@@ -215,10 +225,22 @@ def get_desktop_geometry():
     return map(int, xprop('_NET_DESKTOP_GEOMETRY').split(','))
 
 
+def get_default_download_path():
+    try:
+        import glib
+    except ImportError:
+        base = os.path.expandvars("$HOME/Downloads")
+    else:
+        base = glib.get_user_special_dir(glib.USER_DIRECTORY_DOWNLOAD)
+    return os.path.join(base, "NASA-APOD")
+
+
 if __name__ == '__main__':
     ''' Our program '''
     if not (RESOLUTION_X and RESOLUTION_Y):
         RESOLUTION_X, RESOLUTION_Y = get_desktop_geometry()
+    if not DOWNLOAD_PATH:
+        DOWNLOAD_PATH = get_default_download_path()
     from optparse import OptionParser
     op = OptionParser()
     op.add_option('-v', '--verbose', action='store_true', default=False)
@@ -236,8 +258,8 @@ if __name__ == '__main__':
         print "Starting"
     # Create the download path if it doesn't exist
     DOWNLOAD_PATH = os.path.expandvars(DOWNLOAD_PATH)
-    if not os.path.exists(os.path.expanduser(DOWNLOAD_PATH)):
-        os.makedirs(os.path.expanduser(DOWNLOAD_PATH))
+    if not os.path.exists(DOWNLOAD_PATH):
+        os.makedirs(DOWNLOAD_PATH)
 
     # Grab the HTML contents of the file
     site_contents = download_site(NASA_APOD_SITE)
