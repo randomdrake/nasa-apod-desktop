@@ -145,7 +145,6 @@ def set_wallpaper(file_path):
     # so I'm just relying on specific process names
     window_manager = commands.getoutput("top -n 1 -b ")
     if 'gnome-sessions' in window_manager:
-        #this is for Gnome
         command = "gsettings set org.gnome.desktop.background picture-uri file://" + file_path
     elif 'xfwm4' in window_manager:
         command = "xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-path -s " + file_path
