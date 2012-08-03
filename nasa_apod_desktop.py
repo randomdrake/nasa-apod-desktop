@@ -48,7 +48,7 @@ sudo apt-get install python-imaging
 
 Set your resolution variables and your download path (make sure it's writeable):
 '''
-DOWNLOAD_PATH = '/home/randomdrake/backgrounds/'
+DOWNLOAD_PATH = '/home/mea/Pictures/backgrounds/'
 RESOLUTION_X = 1680
 RESOLUTION_Y = 1050
 ''' 
@@ -135,13 +135,17 @@ def resize_image(filename):
     fhandle = open(filename, 'w')
     image.save(fhandle, 'PNG')
 
-def set_gnome_wallpaper(file_path):
+def set_wallpaper(file_path):
     ''' Sets the new image as the wallpaper '''
     if SHOW_DEBUG:
         print "Setting the wallpaper"
-    command = "gsettings set org.gnome.desktop.background picture-uri file://" + file_path
+    #this is for Gnome
+    #command = "gsettings set org.gnome.desktop.background picture-uri file://" + file_path
+    #but I run xfce
+    command = "xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-path -s " + file_path
     status, output = commands.getstatusoutput(command)
     return status
+
 
 def print_download_status(block_count, block_size, total_size):
     written_size = human_readable_size(block_count * block_size)
@@ -175,7 +179,9 @@ if __name__ == '__main__':
     resize_image(filename)
 
     # Set the wallpaper
-    status = set_gnome_wallpaper(filename)
+    # need to figure out how to differentiate between users running
+    # gnome and users running xfce
+    status = set_wallpaper(filename)
     if SHOW_DEBUG:
         print "Finished!"
 
