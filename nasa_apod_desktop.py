@@ -135,14 +135,20 @@ def resize_image(filename):
     fhandle = open(filename, 'w')
     image.save(fhandle, 'PNG')
 
+
 def set_wallpaper(file_path):
     ''' Sets the new image as the wallpaper '''
     if SHOW_DEBUG:
         print "Setting the wallpaper"
-    #this is for Gnome
-    #command = "gsettings set org.gnome.desktop.background picture-uri file://" + file_path
-    #but I run xfce
-    command = "xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-path -s " + file_path
+    # checking what wm is running.
+    # there is no way to do this in the general case
+    # so I'm just relying on specific process names
+    window_manager = commands.getoutput("top -n 1 -b ")
+    if 'gnome-sessions' in window_manager:
+        #this is for Gnome
+        command = "gsettings set org.gnome.desktop.background picture-uri file://" + file_path
+    elif 'xfwm4' in window_manager:
+        command = "xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-path -s " + file_path
     status, output = commands.getstatusoutput(command)
     return status
 
@@ -154,6 +160,7 @@ def print_download_status(block_count, block_size, total_size):
     # Adding space padding at the end to ensure we overwrite the whole line
     stdout.write("\r%s bytes of %s         " % (written_size, total_size))
     stdout.flush()
+
 
 def human_readable_size(number_bytes):
     for x in ['bytes', 'KB', 'MB']:
