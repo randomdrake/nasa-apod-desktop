@@ -65,6 +65,7 @@ Command: python /path/to/nasa_apod_desktop.py
 Comment: Downloads the latest NASA APOD and sets it as the background.
 5) Click on the "Add" button
 '''
+import subprocess as sp
 import commands
 import urllib
 import urllib2
@@ -134,6 +135,15 @@ def resize_image(filename):
         print "Saving the image to", filename
     fhandle = open(filename, 'w')
     image.save(fhandle, 'PNG')
+
+def set_macosx_wallpaper(file_path):
+    ''' Sets the image as the wallpaper on mac osx '''
+    if SHOW_DEBUG:
+        print "Setting the wallpaper"
+    osa_command = ('tell application "Finder" to set desktop picture to POSIX'
+    ' file "{:s}"'.format(os.path.realpath(file_path)))
+    command = ['osascript', '-e', osa_command]
+    sp.check_call(command)
 
 def set_gnome_wallpaper(file_path):
     ''' Sets the new image as the wallpaper '''
