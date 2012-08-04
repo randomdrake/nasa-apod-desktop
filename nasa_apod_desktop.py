@@ -48,7 +48,8 @@ sudo apt-get install python-imaging
 
 Set your resolution variables and your download path (make sure it's writeable):
 '''
-DOWNLOAD_PATH = '/home/randomdrake/backgrounds/'
+import os
+DOWNLOAD_PATH = os.path.expanduser('~/nasa-backgrounds')
 RESOLUTION_X = 1680
 RESOLUTION_Y = 1050
 ''' 
