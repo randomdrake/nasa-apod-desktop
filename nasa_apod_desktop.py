@@ -185,7 +185,7 @@ if __name__ == '__main__':
     resize_image(filename)
 
     # Set the wallpaper
-    status = set_gnome_wallpaper(filename)
+    set_macosx_wallpaper(filename)
     if SHOW_DEBUG:
         print "Finished!"
 
