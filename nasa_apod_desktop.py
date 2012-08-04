@@ -71,7 +71,7 @@ import urllib
 import urllib2
 import re
 from PIL import Image
-from sys import stdout
+from sys import stdout, platform
 
 # Configurable settings:
 NASA_APOD_SITE = 'http://apod.nasa.gov/apod/'
@@ -185,7 +185,11 @@ if __name__ == '__main__':
     resize_image(filename)
 
     # Set the wallpaper
-    set_macosx_wallpaper(filename)
+    if sys.platform.upper() == 'DARWIN':
+        set_macosx_wallpaper(filename)
+    else:
+        status = set_gnome_wallpaper(filename)
+
     if SHOW_DEBUG:
         print "Finished!"
 
