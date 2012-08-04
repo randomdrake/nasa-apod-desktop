@@ -19,8 +19,8 @@ nasa_apod_desktop.py
 https://github.com/randomdrake/nasa-apod-desktop
 
 Written/Modified by David Drake
-http://randomdrake.com 
-http://twitter.com/randomdrake 
+http://randomdrake.com
+http://twitter.com/randomdrake
 
 Based on apodbackground: http://sourceforge.net/projects/apodbackground/
 Which, is based on: http://0chris.com/nasa-image-day-script-python.html
@@ -36,7 +36,7 @@ Tested on Ubuntu 12.04
 
 
 DESCRIPTION
-1) Grabs the latest image of the day from NASA (http://apod.nasa.gov/apod/). 
+1) Grabs the latest image of the day from NASA (http://apod.nasa.gov/apod/).
 2) Resizes the image to the given resolution.
 3) Sets the image as your desktop.
 4) Adds the image to a list of images that will be cycled through.
@@ -52,7 +52,7 @@ import os
 DOWNLOAD_PATH = os.path.expanduser('~/nasa-backgrounds')
 RESOLUTION_X = 1680
 RESOLUTION_Y = 1050
-''' 
+'''
 
 RUN AT STARTUP
 To have this run whenever you startup your computer, perform the following steps:
@@ -69,7 +69,6 @@ import commands
 import urllib
 import urllib2
 import re
-import os
 from PIL import Image
 from sys import stdout
 
@@ -111,10 +110,10 @@ def get_image(text):
             print "Retrieving image"
             urllib.urlretrieve(file_url, save_to, print_download_status)
 
-            # Adding additional padding to ensure entire line 
+            # Adding additional padding to ensure entire line
             if SHOW_DEBUG:
                 print "\rDone downloading", human_readable_size(file_size), "       "
-        else: 
+        else:
             urllib.urlretrieve(file_url, save_to)
     elif SHOW_DEBUG:
         print "File exists, moving on"
@@ -160,13 +159,13 @@ def human_readable_size(number_bytes):
 
 if __name__ == '__main__':
     ''' Our program '''
-    if SHOW_DEBUG: 
+    if SHOW_DEBUG:
         print "Starting"
     # Create the download path if it doesn't exist
     if not os.path.exists(os.path.expanduser(DOWNLOAD_PATH)):
         os.makedirs(os.path.expanduser(DOWNLOAD_PATH))
 
-    # Grab the HTML contents of the file 
+    # Grab the HTML contents of the file
     site_contents = download_site(NASA_APOD_SITE)
 
     # Download the image
