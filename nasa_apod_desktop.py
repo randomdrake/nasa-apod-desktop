@@ -71,7 +71,9 @@ import re
 import os
 import sys
 import subprocess
+import logging
 
+LOG = logging.getLogger(__name__)
 # Configurable settings:
 NASA_APOD_SITE = 'http://apod.nasa.gov/apod/'
 SHOW_DEBUG = False
@@ -94,6 +96,8 @@ def get_image(text):
     if SHOW_DEBUG:
         print "Grabbing the image URL"
     reg = re.search('<a href="(image.*?)"', text, re.DOTALL)
+    if not reg:
+        LOG.error('cannot find image url in %r', text)
     if 'http' in reg.group(1):
         # Actual url
         file_url = reg.group(1)
@@ -237,6 +241,12 @@ def get_default_download_path():
 
 if __name__ == '__main__':
     ''' Our program '''
+    logging.basicConfig(level=logging.DEBUG)
+
+    if not 'XAUTHORITY' in os.environ:
+        os.environ['DISPLAY'] = ':0.0'
+        os.environ['XAUTHORITY'] = os.path.expandvars('$HOME/.Xauthority')
+
     if not (RESOLUTION_X and RESOLUTION_Y):
         RESOLUTION_X, RESOLUTION_Y = get_desktop_geometry()
     if not DOWNLOAD_PATH:
