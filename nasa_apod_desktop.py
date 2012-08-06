@@ -64,6 +64,7 @@ Command: python /path/to/nasa_apod_desktop.py
 Comment: Downloads the latest NASA APOD and sets it as the background.
 5) Click on the "Add" button
 '''
+import os
 import subprocess as sp
 import commands
 import urllib
