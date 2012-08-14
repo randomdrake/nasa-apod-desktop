@@ -71,6 +71,7 @@ import re
 import os
 from PIL import Image
 from sys import stdout
+from sys import exit
 
 # Configurable settings:
 NASA_APOD_SITE = 'http://apod.nasa.gov/apod/'
@@ -91,12 +92,17 @@ def get_image(text):
     if SHOW_DEBUG:
         print "Grabbing the image URL"
     reg = re.search('<a href="(image.*?)"', text, re.DOTALL)
-    if 'http' in reg.group(1):
-        # Actual url
-        file_url = reg.group(1)
+    if reg:
+        if 'http' in reg.group(1):
+            # Actual url
+            file_url = reg.group(1)
+        else:
+            # Relative path, handle it
+            file_url = NASA_APOD_SITE + reg.group(1)
     else:
-        # Relative path, handle it
-        file_url = NASA_APOD_SITE + reg.group(1)
+        if SHOW_DEBUG:
+            print "Could not find an image. May be a video today."
+        exit()
 
     filename = os.path.basename(file_url)
     save_to = DOWNLOAD_PATH + os.path.splitext(filename)[0] + '.png'
