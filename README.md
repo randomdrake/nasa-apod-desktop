@@ -53,10 +53,10 @@ While the script will detect as much as possible and has safe defaults, you may 
 
 * __DOWNLOAD\_PATH__ - where you want the file to be downloaded. Will be auto-detected if not set.
 * __CUSTOM\_FOLDER__ - if we detect your download folder, this will be the target folder in there.
-* __RESOUTION\_TYPE__ - 
-1. 'stretch': single monitor or the combined resolution of your available monitors
-2. 'largest': largest resolution of your available monitors
-3. 'default': use the default resolution that is set
+* __RESOUTION\_TYPE__ -   
+    'stretch': single monitor or the combined resolution of your available monitors  
+    'largest': largest resolution of your available monitors      
+    'default': use the default resolution that is set
 * __RESOLUTION\_X__ - horizontal resolution if RESOLUTION\_TYPE is not default or cannot be automatically determined
 * __RESOLUTION\_Y__ - vertical resolution if RESOLUTION\_TYPE is not default or cannot be automatically determined
 * __NASA\_APOD\_SITE__ - location of the current picture of the day
