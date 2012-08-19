@@ -48,10 +48,11 @@ sudo apt-get install python-imaging
 
 Set your resolution variables and your download path (make sure it's writeable):
 '''
-DOWNLOAD_PATH = '/home/randomdrake/backgrounds/'
-RESOLUTION_X = 1680
-RESOLUTION_Y = 1050
-''' 
+# Safe defaults, no need to change
+DOWNLOAD_PATH = '/tmp/backgrounds/'
+RESOLUTION_X = 800
+RESOLUTION_Y = 600
+'''
 
 RUN AT STARTUP
 To have this run whenever you startup your computer, perform the following steps:
@@ -64,6 +65,8 @@ Command: python /path/to/nasa_apod_desktop.py
 Comment: Downloads the latest NASA APOD and sets it as the background.
 5) Click on the "Add" button
 '''
+import glib
+import subprocess
 import commands
 import urllib
 import urllib2
@@ -76,6 +79,27 @@ from sys import exit
 # Configurable settings:
 NASA_APOD_SITE = 'http://apod.nasa.gov/apod/'
 SHOW_DEBUG = False
+
+# run "xrandr | grep current" and parse output to obtain the desktop resolution
+# see http://docs.python.org/library/subprocess.html#replacing-shell-pipeline
+def find_resolution():
+    p1 = subprocess.Popen(["xrandr"], stdout=subprocess.PIPE)
+    p2 = subprocess.Popen(["grep", "current"], stdin=p1.stdout, stdout=subprocess.PIPE)
+    p1.stdout.close()
+    output = p2.communicate()[0]
+
+    reg = re.search(".* current (.*?) x (.*?),.*", output)
+    RES_X = int(reg.group(1))
+    RES_Y = int(reg.group(2))
+    return RES_X, RES_Y
+
+# Uses glib to find the localized "Downloads" folder
+# see http://askubuntu.com/questions/137896/how-to-get-the-user-downloads-folder-location-with-python
+def set_download_folder():
+    downloads_dir = glib.get_user_special_dir(glib.USER_DIRECTORY_DOWNLOAD)
+    # use equivalent to /home/user/Downloads/NASA-APOD
+    new_path = os.path.join(downloads_dir, "NASA-APOD")
+    return new_path
 
 def download_site(url):
     ''' Download HTML of the site'''
@@ -105,7 +129,8 @@ def get_image(text):
         exit()
 
     filename = os.path.basename(file_url)
-    save_to = DOWNLOAD_PATH + os.path.splitext(filename)[0] + '.png'
+    save_to = os.path.splitext(filename)[0] + '.png'
+    save_to = os.path.join(DOWNLOAD_PATH, save_to)
     if not os.path.isfile(save_to):
         if SHOW_DEBUG:
             print "Opening remote URL"
@@ -167,6 +192,13 @@ if __name__ == '__main__':
     ''' Our program '''
     if SHOW_DEBUG: 
         print "Starting"
+
+    # Find desktop resolution
+    RESOLUTION_X, RESOLUTION_Y = find_resolution()
+
+    # Set a localized download folder
+    DOWNLOAD_PATH = set_download_folder()
+
     # Create the download path if it doesn't exist
     if not os.path.exists(os.path.expanduser(DOWNLOAD_PATH)):
         os.makedirs(os.path.expanduser(DOWNLOAD_PATH))
