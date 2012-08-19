@@ -91,8 +91,6 @@ from PIL import Image
 from sys import stdout
 from sys import exit
 
-# Configurable settings:
-
 """
 Use XRandR to grab the desktop resolution. If the scaling method is set to 'largest',
 we will attempt to grab it from the largest connected device. If the scaling method
