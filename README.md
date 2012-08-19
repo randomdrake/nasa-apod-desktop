@@ -16,6 +16,14 @@ http://apod.nasa.gov/apod/astropix.html
 
 Tested on, and created for, Ubuntu 12.04.
 
+How it Works:
+=====
+1. Grabs your current download path
+2. Downloads the latest image of the day from NASA ([http://apod.nasa.gov/apod/](http://apod.nasa.gov/apod/))
+3. Determines your desktop resolution, or uses the set default
+4. Resizes the image to the given resolution
+5. Sets the image as your desktop
+
 Development:
 =====
 I really enjoyed the NASA background images that were easily available in Windows 7. I wanted to recreate the experience for Ubuntu as I don't use Windows 7 at home, much.
@@ -38,6 +46,21 @@ Installation:
 * Install python-imaging (sudo apt-get install python-imaging)
 * Place the file wherever you like and chmod +x it to make it executable
 * Set the defaults in the file 
+  
+Defaults:
+=====
+While the script will detect as much as possible and has safe defaults, you may want to set your own.
+
+* __DOWNLOAD\_PATH__ - where you want the file to be downloaded. Will be auto-detected if not set.
+* __CUSTOM\_FOLDER__ - if we detect your download folder, this will be the target folder in there.
+* __RESOUTION\_TYPE__ - 
+1. 'stretch': single monitor or the combined resolution of your available monitors
+2. 'largest': largest resolution of your available monitors
+3. 'default': use the default resolution that is set
+* __RESOLUTION\_X__ - horizontal resolution if RESOLUTION\_TYPE is not default or cannot be automatically determined
+* __RESOLUTION\_Y__ - vertical resolution if RESOLUTION\_TYPE is not default or cannot be automatically determined
+* __NASA\_APOD\_SITE__ - location of the current picture of the day
+* __SHOW\_DEBUG__ - whether to print useful debugging information or statuses
 
 Run at Startup:
 =====
@@ -58,7 +81,7 @@ To Do:
 License:
 =====
 Open-source and free for use.
->Copyright 2012 David Drake
+>Copyright (c) 2012 David Drake
 >
 >Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 >
