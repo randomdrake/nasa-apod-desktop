@@ -100,7 +100,8 @@ what was set for the default resolutions.
 def find_resolution():
 
     if RESOLUTION_TYPE == 'default':
-        print "Using default resolution of %sx%s" % (RESOLUTION_X, RESOLUTION_Y)
+        if SHOW_DEBUG:
+            print "Using default resolution of %sx%s" % (RESOLUTION_X, RESOLUTION_Y)
         return RESOLUTION_X, RESOLUTION_Y
 
     res_x = 0
@@ -144,7 +145,8 @@ def find_resolution():
         if SHOW_DEBUG:
             print "Could not determine resolution automatically. Using defaults."
 
-    print "Using detected resolution of %sx%s" % (res_x, res_y)
+    if SHOW_DEBUG:
+        print "Using detected resolution of %sx%s" % (res_x, res_y)
 
     return int(res_x), int(res_y)
 
@@ -179,31 +181,26 @@ def get_image(text):
     """ Finds the image URL and saves it """
     if SHOW_DEBUG:
         print "Grabbing the image URL"
-    reg = re.search('<a href="(image.*?)"', text, re.DOTALL)
-    if reg:
-        if 'http' in reg.group(1):
-            # Actual url
-            file_url = reg.group(1)
-        else:
-            # Relative path, handle it
-            file_url = NASA_APOD_SITE + reg.group(1)
-    else:
-        if SHOW_DEBUG:
-            print "Could not find an image. May be a video today."
-        exit()
+    file_url, filename, file_size = get_image_info('a href', text)
 
-    filename = os.path.basename(file_url)
     if SHOW_DEBUG:
         print "Found name of image:", filename
-    save_to = os.path.splitext(filename)[0] + '.png'
-    save_to = os.path.join(DOWNLOAD_PATH, save_to)
+
+    save_to = os.path.join(DOWNLOAD_PATH, os.path.splitext(filename)[0] + '.png')
+
     if not os.path.isfile(save_to):
-        if SHOW_DEBUG:
-            print "Opening remote URL"
-        remote_file = urllib.urlopen(file_url)
+        # If the response body is less than 500 bytes, something went wrong
+        if file_size < 500:
+            print "Response less than 500 bytes, probably an error\nAttempting to just grab image source"
+            file_url, filename, file_size = get_image_info('img src', text)
+            print "Found name of image:", filename
+            if file_size < 500:
+                # Give up
+                if SHOW_DEBUG:
+                    print "Could not find image to download"
+                exit()
 
         if SHOW_DEBUG:
-            file_size = float(remote_file.headers.get("content-length"))
             print "Retrieving image"
             urllib.urlretrieve(file_url, save_to, print_download_status)
 
@@ -258,6 +255,33 @@ def human_readable_size(number_bytes):
         if number_bytes < 1024.0:
             return "%3.2f%s" % (number_bytes, x)
         number_bytes /= 1024.0
+
+def get_image_info(element, text):
+    """ Grabs information about the image """
+    regex = '<' +  element + '="(image.*?)"'
+    reg = re.search(regex, text, re.IGNORECASE)
+    if reg:
+        if 'http' in reg.group(1):
+            # Actual URL
+            file_url = reg.group(1)
+        else:
+            # Relative path, handle it
+            file_url = NASA_APOD_SITE + reg.group(1)
+    else: 
+        if SHOW_DEBUG:
+            print "Could not find an image. May be a video today."
+        exit()
+
+    # Create our handle for our remote file
+    if SHOW_DEBUG:
+        print "Opening remote URL"
+        
+    remote_file = urllib.urlopen(file_url)
+
+    filename = os.path.basename(file_url)
+    file_size = float(remote_file.headers.get("content-length"))
+
+    return file_url, filename, file_size
 
 if __name__ == '__main__':
     """ Our program """
