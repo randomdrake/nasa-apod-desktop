@@ -23,6 +23,9 @@ How it Works:
 3. Determines your desktop resolution, or uses the set default
 4. Resizes the image to the given resolution
 5. Sets the image as your desktop
+6. Adds image to XML file used to scroll through desktop background images.
+
+It's not very exciting to scroll through a single image, so it will attempt to download additional images (default: 10) to seed your list of images.
 
 Development:
 =====
@@ -36,15 +39,19 @@ Searching around in Google, I came across the [apodbackground](http://apod.nasa.
 * Checked to see if the file already existed before performing the download.
 * Saving as a PNG instead of a JPG. Yes, the filesize is increased quite a bit but we remove the artifacts and get a much cleaner image.
 
+After I modified the original script, I still wanted to allow for the image scrolling to return. I found the XML file that comes with Ubuntu in /usr/share/backgrounds/contest/precise.xml that is used to create the background scrolling. From there, I got a hold of lxml and went to town. 
+
+But, generating the XML file wasn't enough. I also wanted to start with a number of images so I would actually have some to scroll through. 
+
 While searching around for the original source, I found out that the project I grabbed from was originally based on a [different script](http://apod.nasa.gov/apod/astropix.html), which I think is worth mentioning.
 
 Please note: I am not extremely well-versed in Python. I have been playing with the language and Django lately so, if improvements could be made, please let me know.
 
 Installation:
 =====
-* Ensure you have Python installed (default in Ubuntu)
-* Install python-imaging (sudo apt-get install python-imaging)
 * Place the file wherever you like and chmod +x it to make it executable
+* Ensure you have Python installed (default for Ubuntu) and the PIL and lxml packages:
+* pip install -f requirements.txt or sudo apt-get install python-imaging python-lxml
 * Set the defaults in the file 
   
 Defaults:
@@ -60,6 +67,9 @@ While the script will detect as much as possible and has safe defaults, you may 
 * __RESOLUTION\_X__ - horizontal resolution if RESOLUTION\_TYPE is not default or cannot be automatically determined
 * __RESOLUTION\_Y__ - vertical resolution if RESOLUTION\_TYPE is not default or cannot be automatically determined
 * __NASA\_APOD\_SITE__ - location of the current picture of the day
+* __IMAGE_SCROLL__   - if true, will write also write an XML file to make the images scroll
+* __IMAGE_DURATION__ - if IMAGE\_SCROLL is enabled, this is the duration each will stay in seconds
+* __SEED_IMAGES__    - if > 0, it will download previous images as well to seed the list of images
 * __SHOW\_DEBUG__ - whether to print useful debugging information or statuses
 
 Run at Startup:
@@ -74,8 +84,6 @@ If you want the file to automatically run at startup:
 
 To Do:
 =====
-* Make this download the file and append to an appropriate XML file so I can get the cycling background back.
-* In addition to the XML file, I would like to have the script seed 10 images to scroll through to get started.
 * Make a blog post / homepage.
 
 License:
