@@ -22,9 +22,6 @@
 # http://randomdrake.com 
 # http://twitter.com/randomdrake 
 # 
-# Based on apodbackground: http://sourceforge.net/projects/apodbackground/
-# Which, is based on: http://0chris.com/nasa-image-day-script-python.html
-# 
 # 
 # Tested on Ubuntu 12.04
 # 
