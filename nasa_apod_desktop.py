@@ -312,6 +312,8 @@ def create_desktop_background_scoll(filename):
 
     # Get our images in a random order so we get a new order every time we get a new file
     random.shuffle(images)
+    # Recalculate the number of pictures
+    num_images = len(images)
 
     for i, image in enumerate(images):
         # Create a static entry for keeping this image here for IMAGE_DURATION
