@@ -368,7 +368,7 @@ def get_image_info(element, text):
             print "Could not find an image. May be a video today."
         exit()
 
-   # Create our handle for our remote file
+    # Create our handle for our remote file
     if SHOW_DEBUG:
         print "Opening remote URL"
         
