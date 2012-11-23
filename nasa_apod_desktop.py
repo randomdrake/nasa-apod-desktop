@@ -189,6 +189,9 @@ def get_image(text):
     if SHOW_DEBUG:
         print "Grabbing the image URL"
     file_url, filename, file_size = get_image_info('a href', text)
+    # If file_url is None, the today's picture might be a video
+    if file_url is None:
+        return None
 
     if SHOW_DEBUG:
         print "Found name of image:", filename
@@ -200,6 +203,9 @@ def get_image(text):
         if file_size < 500:
             print "Response less than 500 bytes, probably an error\nAttempting to just grab image source"
             file_url, filename, file_size = get_image_info('img src', text)
+            # If file_url is None, the today's picture might be a video
+            if file_url is None:
+                return None
             print "Found name of image:", filename
             if file_size < 500:
                 # Give up
@@ -302,6 +308,11 @@ def create_desktop_background_scoll(filename):
                 continue
 
             seed_filename = get_image(seed_site_contents)
+            # If the content was an video or some other error occurred, skip the
+            # rest.
+            if seed_filename is None:
+                continue
+
             resize_image(seed_filename)
 
             # Add this to our list of images
@@ -366,7 +377,7 @@ def get_image_info(element, text):
     else: 
         if SHOW_DEBUG:
             print "Could not find an image. May be a video today."
-        exit()
+        return None, None, None
 
     # Create our handle for our remote file
     if SHOW_DEBUG:
@@ -403,12 +414,19 @@ if __name__ == '__main__':
 
     # Download the image
     filename = get_image(site_contents)
-
-    # Resize the image
-    resize_image(filename)
+    if filename is not None:
+        # Resize the image
+        resize_image(filename)
 
     # Create the desktop switching xml
     filename = create_desktop_background_scoll(filename)
+    filename = None
+    # If the script was unable todays image and IMAGE_SCROLL is set to False,
+    # the script exits
+    if filename is None:
+        if SHOW_DEBUG:
+            print "Today's image could not be downloaded."
+        exit()
 
     # Set the wallpaper
     status = set_gnome_wallpaper(filename)
