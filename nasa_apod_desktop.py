@@ -420,7 +420,6 @@ if __name__ == '__main__':
 
     # Create the desktop switching xml
     filename = create_desktop_background_scoll(filename)
-    filename = None
     # If the script was unable todays image and IMAGE_SCROLL is set to False,
     # the script exits
     if filename is None:
