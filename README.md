@@ -29,6 +29,7 @@ It's not very exciting to scroll through a single image, so it will attempt to d
 
 Development:
 =====
+
 I really enjoyed the NASA background images that were easily available in Windows 7. I wanted to recreate the experience for Ubuntu as I don't use Windows 7 at home, much.
 
 Searching around in Google, I came across the [apodbackground](http://apod.nasa.gov/apod/astropix.html) project. Unfortunately, the git link was broken. I eventually found a mirror and took a look at the code. There were a few changes that I thought were necessary:
@@ -89,6 +90,9 @@ To Do:
 License:
 =====
 Open-source and free for use.
+
+Unfortunately, I don't have time to update this script at the moment. This software is currently as-is and I would definitely recommend checking out some of the various forks for updates or fixes.
+
 >Copyright (c) 2012 David Drake
 >
 >Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
