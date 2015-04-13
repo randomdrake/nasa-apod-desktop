@@ -91,7 +91,7 @@ License:
 =====
 Open-source and free for use.
 
-Unfortunately, I don't have time to update this script at the moment. This software is currently as-is and I would definitely recommend checking out some of the various forks for updates or fixes.
+Unfortunately, I don't have time to update this script at the moment. This software is currently as is and I would definitely recommend checking out some of the various forks for updates or fixes.
 
 >Copyright (c) 2012 David Drake
 >
