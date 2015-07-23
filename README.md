@@ -55,7 +55,7 @@ Installation:
 * `pip install -f requirements.txt` or `sudo apt-get install python-imaging python-lxml python-lxml-dbg libxml2-dev libxslt1-dev python-dev`
   * pip may have trouble installing PIL, if so run `pip install PIL --allow-external PIL --allow-unverified PIL`
 * Set the defaults in the file 
-  
+  * If installing in `virtualenv`, use `pip install ruamel.venvgtk` if you get errors related to `glib`
 Defaults:
 =====
 While the script will detect as much as possible and has safe defaults, you may want to set your own.
