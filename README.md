@@ -52,7 +52,7 @@ Installation:
 =====
 * Place the file wherever you like and `chmod +x` it to make it executable
 * Ensure you have Python installed (default for Ubuntu) and the PIL and lxml packages:
-* `pip install -f requirements.txt` or `sudo apt-get install python-imaging python-lxml`
+* `pip install -f requirements.txt` or `sudo apt-get install python-imaging python-lxml python-lxml-dbg libxml2-dev libxslt1-dev python-dev`
   * pip may have trouble installing PIL, if so run `pip install PIL --allow-external PIL --allow-unverified PIL`
 * Set the defaults in the file 
   
