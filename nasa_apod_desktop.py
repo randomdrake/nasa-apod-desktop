@@ -71,6 +71,7 @@
 # IMAGE_DURATION - if IMAGE_SCROLL is enabled, this is the duration each will stay in seconds
 # SEED_IMAGES    - if > 0, it will download previous images as well to seed the list of images
 # SHOW_DEBUG     - print useful debugging information or statuses
+# SHOW_TITLE     - sends desktop notifications with the title of the image (works only if IMAGE_SCROLL = False)
 
 DOWNLOAD_PATH = '/tmp/backgrounds/'
 CUSTOM_FOLDER = 'nasa-apod-backgrounds'
@@ -82,6 +83,7 @@ IMAGE_SCROLL = True
 IMAGE_DURATION = 1200
 SEED_IMAGES = 10
 SHOW_DEBUG = False
+SHOW_TITLE = True
 
 import glib
 import subprocess
@@ -390,6 +392,19 @@ def get_image_info(element, text):
 
     return file_url, filename, file_size
 
+def striphtml(data):
+    p = re.compile(r'<.*?>')
+    return p.sub('', data)
+
+def showtitle(site_contents):
+	if SHOW_TITLE and not(IMAGE_SCROLL):
+		for line in site_contents.splitlines():
+		    if line.startswith('<b>'):
+		    	if SHOW_DEBUG:
+		       		print "Title: " + striphtml(line)
+		       	os.system("notify-send \"Wallpaper - "+striphtml(line).strip()+"\"")
+		       	break
+
 if __name__ == '__main__':
     # Our program
     if SHOW_DEBUG: 
@@ -417,6 +432,7 @@ if __name__ == '__main__':
     if filename is not None:
         # Resize the image
         resize_image(filename)
+        showtitle(site_contents)
 
     # Create the desktop switching xml
     filename = create_desktop_background_scoll(filename)
