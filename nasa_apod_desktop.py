@@ -58,7 +58,7 @@
 # 
 # DOWNLOAD_PATH  - where you want the file to be downloaded. Will be auto-detected if not set.
 # CUSTOM_FOLDER  - if we detect your download folder, this will be the target folder in there.
-# RESOUTION_TYPE - 
+# RESOLUTION_TYPE -
 #     'stretch': single monitor or the combined resolution of your available monitors
 #     'largest': largest resolution of your available monitors
 #     'default': use the default resolution that is set
@@ -119,21 +119,21 @@ def find_resolution():
         regex_search = 'connected'
     else:
         regex_search = 'current'
-        
-    p1 = subprocess.Popen(["xrandr"], stdout=subprocess.PIPE)
+
+    p1 = subprocess.Popen(["xrandr", "--query"], stdout=subprocess.PIPE)
     p2 = subprocess.Popen(["grep", regex_search], stdin=p1.stdout, stdout=subprocess.PIPE)
     p1.stdout.close()
     output = p2.communicate()[0]
 
     if RESOLUTION_TYPE == 'largest':
         # We are going to go through the connected devices and get the X/Y from the largest
-        matches = re.finditer(" connected ([0-9]+)x([0-9]+)+", output)
+        matches = re.finditer("\sconnected\s(primary\s)?(\d+)x(\d+)\+", output)
         if matches:
             largest = 0
             for match in matches:
-                if int(match.group(1)) * int(match.group(2)) > largest:
-                    res_x = match.group(1)
-                    res_y = match.group(2)
+                if int(match.group(2)) * int(match.group(3)) > largest:
+                    res_x = match.group(2)
+                    res_y = match.group(3)
         elif SHOW_DEBUG:
             print "Could not determine largest screen resolution."
     else:
